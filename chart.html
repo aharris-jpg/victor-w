@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>How Big Is Victor Wembanyama? — Vegas Insider</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;min-height:100vh}
+.wrap{width:100%;max-width:700px;border:1px solid #ddd;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+.gold-bar{height:4px;background:#B6842D}
+.hdr{background:#24324A;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hdr-left h1{color:#fff;font-size:15px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.hdr-left p{color:rgba(255,255,255,.5);font-size:11px;margin-top:3px}
+.hdr-logo{height:36px;border-radius:4px;flex-shrink:0}
+.note{padding:9px 20px;font-size:12px;color:#666;border-bottom:1px solid #eee;line-height:1.5}
+.note strong{color:#222}
+.tabs{padding:11px 20px;border-bottom:1px solid #eee;display:flex;gap:7px;flex-wrap:wrap}
+.tab{padding:5px 13px;border-radius:20px;border:1px solid #ccc;background:#fff;color:#666;font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit}
+.tab.on{background:#B6842D;border-color:#B6842D;color:#fff}
+.tab:hover:not(.on){background:#f5f4f0}
+.stage{padding:24px 20px 20px;background:#fff}
+.canvas{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:18px}
+.ground-line{position:absolute;bottom:0;left:0;right:0;height:1.5px;background:#ddd}
+.fig{display:flex;flex-direction:column;align-items:center;cursor:default;position:relative;flex-shrink:0}
+.fig svg{display:block}
+.fig-label{margin-top:8px;font-size:11px;color:#888;text-align:center;line-height:1.35;max-width:72px}
+.fig-label b{display:block;font-size:11px;font-weight:600;color:#222}
+.fig-label.gold b{color:#B6842D}
+.tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a2535;color:#fff;padding:7px 11px;border-radius:6px;font-size:11px;white-space:nowrap;z-index:20;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(182,132,45,.4)}
+.tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a2535}
+.fig:hover .tip{opacity:1}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#eee;border-top:1px solid #eee}
+.stat{background:#fff;padding:10px 14px}
+.stat-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.05em}
+.stat-val{font-size:17px;font-weight:600;color:#B6842D;margin-top:2px}
+.stat-sub{font-size:10px;color:#aaa;margin-top:1px}
+.foot{padding:9px 20px;background:#f9f8f5;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.foot span{font-size:10px;color:#999}
+.foot a{font-size:10px;color:#B6842D;text-decoration:none;font-weight:600;letter-spacing:.04em}
+.foot a:hover{text-decoration:underline}
+.wing-row{display:flex;align-items:center;gap:12px;padding:4px 0}
+.wing-row svg{display:block;flex-shrink:0}
+.wing-lbl{font-size:11px;color:#888;line-height:1.35}
+.wing-lbl b{display:block;font-weight:600;font-size:11px;color:#222}
+.wing-lbl.gold b{color:#B6842D}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="gold-bar"></div>
+  <div class="hdr">
+    <div class="hdr-left">
+      <h1>How big is Victor Wembanyama?</h1>
+      <p>7'4" height · 8'0" wingspan · 246 lbs · Standing reach: 9'9"</p>
+    </div>
+    <a href="https://www.vegasinsider.com" target="_blank">
+      <img src="https://i.postimg.cc/RCWSWbzk/vegas-insider.jpg" class="hdr-logo" alt="Vegas Insider"/>
+    </a>
+  </div>
+  <div class="note"><strong>Drawn to scale.</strong> Every figure uses the same pixel-per-inch ratio. Wembanyama appears in gold on every panel. Hover any figure for details.</div>
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-cat="players">NBA players</button>
+    <button class="tab" data-cat="everyday">Everyday objects</button>
+    <button class="tab" data-cat="landmarks">Landmarks</button>
+    <button class="tab" data-cat="wingspan">Wingspan</button>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="stats">
+    <div class="stat"><div class="stat-lbl">Height</div><div class="stat-val">7'4"</div><div class="stat-sub">88 in / 224 cm</div></div>
+    <div class="stat"><div class="stat-lbl">Wingspan</div><div class="stat-val">8'0"</div><div class="stat-sub">96 in / 244 cm</div></div>
+    <div class="stat"><div class="stat-lbl">Standing reach</div><div class="stat-val">9'9"</div><div class="stat-sub">117 in / 297 cm</div></div>
+  </div>
+  <div class="foot">
+    <span>Sources: NBA Draft Combine · official measurements</span>
+    <a href="https://www.vegasinsider.com" target="_blank">VEGASINSIDER.COM</a>
+  </div>
+</div>
+
+<script>
+const GOLD='#B6842D',DARK='#3d3d3d',MID='#7a7a7a',LITE='#b0b0b0';
+const cats={
+  players:[
+    {n:"Muggsy Bogues",in:63,lbl:"5'3\"",tip:"Shortest-ever NBA player",c:LITE},
+    {n:"Avg US man",in:69,lbl:"5'9\"",tip:"Average American male height",c:LITE},
+    {n:"LeBron James",in:81,lbl:"6'9\"",tip:"4× NBA champion",c:MID},
+    {n:"Giannis",in:83,lbl:"6'11\"",tip:"Milwaukee Bucks franchise star",c:MID},
+    {n:"Chet Holmgren",in:85,lbl:"7'1\"",tip:"OKC Thunder centre",c:MID},
+    {n:"Wembanyama",in:88,lbl:"7'4\"",tip:"Wingspan 8'0\" · Reach 9'9\"",c:GOLD,w:true},
+    {n:"Manute Bol",in:91,lbl:"7'7\"",tip:"Tallest NBA player ever recorded",c:DARK},
+  ],
+  everyday:[
+    {n:"Standard door",in:80,lbl:"6'8\"",tip:"US interior door height",c:MID,t:'door'},
+    {n:"NBA rim",in:120,lbl:"10'0\"",tip:"Wemby's reach is just 3\" short flat-footed",c:MID,t:'rim'},
+    {n:"Double-decker bus",in:175,lbl:"14'7\"",tip:"London double-decker bus height",c:DARK,t:'bus'},
+    {n:"Wembanyama",in:88,lbl:"7'4\"",tip:"Can almost touch the rim standing still",c:GOLD,w:true,t:'person'},
+  ],
+  landmarks:[
+    {n:"Wembanyama",in:88,lbl:"7'4\"",tip:"224 cm of generational talent",c:GOLD,w:true,t:'person'},
+    {n:"Stonehenge",in:252,lbl:"21'0\"",tip:"Tallest upright stone at Stonehenge",c:'#8b7355',t:'stonehenge'},
+    {n:"Niagara Falls",in:2040,lbl:"170'0\"",tip:"About 23 Wembanyamas stacked",c:'#5b8fa8',t:'falls'},
+    {n:"Statue of Liberty",in:1860,lbl:"155'0\"",tip:"Ground to torch tip — 305 ft total",c:'#8aab9c',t:'liberty'},
+    {n:"Eiffel Tower",in:3937,lbl:"328'0\"",tip:"~450 Wembanyamas stacked — structural top",c:'#607080',t:'eiffel'},
+  ],
+  wingspan:[
+    {n:"Car width",in:73,lbl:"~6'1\"",tip:"Typical sedan width: ~73 inches",c:LITE,hz:true},
+    {n:"King-size bed",in:80,lbl:"80\" long",tip:"Wingspan clears both ends by 16 inches",c:MID,hz:true},
+    {n:"Avg NBA wingspan",in:83,lbl:"6'11\"",tip:"League-average wingspan across all positions",c:DARK,hz:true},
+    {n:"Wembanyama wingspan",in:96,lbl:"8'0\"",tip:"Widest wingspan recorded at NBA draft combine",c:GOLD,w:true,hz:true},
+  ]
+};
+
+function personSVG(h,c,isW){
+  const w=Math.max(14,Math.round(h*.26));
+  const hr=Math.max(4,Math.round(w*.36));
+  const bH=Math.round(h*.5);const lH=Math.round(h*.38);
+  const cx=Math.round(w/2);const hY=hr;
+  const bT=hr*2+2;const bB=bT+bH;
+  const aw=isW?2.5:1.8;
+  const ax1=Math.round(w*.04);const ax2=Math.round(w*.96);
+  const aY=bT+Math.round(bH*.38);
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+  <circle cx="${cx}" cy="${hY}" r="${hr}" fill="${c}"/>
+  <rect x="${cx-Math.round(w*.16)}" y="${bT}" width="${Math.round(w*.32)}" height="${bH}" rx="2" fill="${c}"/>
+  <rect x="${cx-Math.round(w*.16)}" y="${bB-2}" width="${Math.round(w*.13)}" height="${lH}" rx="2" fill="${c}"/>
+  <rect x="${cx+3}" y="${bB-2}" width="${Math.round(w*.13)}" height="${lH}" rx="2" fill="${c}"/>
+  <line x1="${cx}" y1="${bT+6}" x2="${ax1}" y2="${aY}" stroke="${c}" stroke-width="${aw}" stroke-linecap="round"/>
+  <line x1="${cx}" y1="${bT+6}" x2="${ax2}" y2="${aY}" stroke="${c}" stroke-width="${aw}" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function objSVG(item,h){
+  const t=item.t||'person';const c=item.c;
+  if(t==='person') return personSVG(h,c,item.w);
+  if(t==='door'){
+    const w=Math.max(20,Math.round(h*.42));
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <rect x="1" y="0" width="${w-2}" height="${h}" rx="2" fill="${c}" opacity=".85"/>
+    <rect x="3" y="2" width="${Math.round((w-6)*.48)}" height="${Math.round(h*.28)}" rx="1" fill="rgba(255,255,255,.18)"/>
+    <rect x="${Math.round(w*.53)}" y="2" width="${Math.round((w-6)*.44)}" height="${Math.round(h*.28)}" rx="1" fill="rgba(255,255,255,.18)"/>
+    <circle cx="${w-8}" cy="${Math.round(h*.6)}" r="3" fill="rgba(255,255,255,.5)"/>
+    </svg>`;
+  }
+  if(t==='rim'){
+    const w=44;const rimH=Math.round(10*(h/item.in));const postH=h-rimH;
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <rect x="20" y="0" width="4" height="${postH}" fill="${c}" opacity=".5"/>
+    <rect x="6" y="${postH-20}" width="${w-12}" height="14" rx="2" fill="${c}" opacity=".8"/>
+    <rect x="8" y="${postH-18}" width="${w-16}" height="10" rx="1" fill="rgba(255,255,255,.15)"/>
+    <ellipse cx="${w/2}" cy="${postH}" rx="13" ry="4" fill="none" stroke="${c}" stroke-width="2.5"/>
+    <line x1="${w/2}" y1="${postH+4}" x2="${w/2}" y2="${postH+16}" stroke="${c}" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+  }
+  if(t==='bus'){
+    const w=Math.max(36,Math.round(h*.4));const bH=h-12;const midY=Math.round(bH*.44);
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <rect x="3" y="0" width="${w-6}" height="${bH}" rx="5" fill="${c}" opacity=".75"/>
+    <rect x="3" y="${midY}" width="${w-6}" height="2" fill="rgba(255,255,255,.25)"/>
+    <rect x="8" y="5" width="${Math.round((w-20)/2.2)}" height="${Math.round(midY*.7)}" rx="1" fill="rgba(255,255,255,.3)"/>
+    <rect x="${Math.round(w/2)}" y="5" width="${Math.round((w-20)/2.2)}" height="${Math.round(midY*.7)}" rx="1" fill="rgba(255,255,255,.3)"/>
+    <rect x="8" y="${midY+5}" width="${Math.round((w-20)/2.2)}" height="${Math.round(midY*.65)}" rx="1" fill="rgba(255,255,255,.3)"/>
+    <rect x="${Math.round(w/2)}" y="${midY+5}" width="${Math.round((w-20)/2.2)}" height="${Math.round(midY*.65)}" rx="1" fill="rgba(255,255,255,.3)"/>
+    <circle cx="14" cy="${h-4}" r="6" fill="${c}"/>
+    <circle cx="14" cy="${h-4}" r="3" fill="rgba(0,0,0,.2)"/>
+    <circle cx="${w-14}" cy="${h-4}" r="6" fill="${c}"/>
+    <circle cx="${w-14}" cy="${h-4}" r="3" fill="rgba(0,0,0,.2)"/>
+    </svg>`;
+  }
+  if(t==='stonehenge'){
+    const w=Math.max(18,Math.round(h*.32));const capH=Math.max(6,Math.round(h*.08));
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <rect x="${Math.round(w*.2)}" y="${capH}" width="${Math.round(w*.6)}" height="${h-capH}" rx="2" fill="${c}" opacity=".85"/>
+    <rect x="0" y="0" width="${w}" height="${capH}" rx="2" fill="${c}"/>
+    <rect x="${Math.round(w*.28)}" y="${capH+4}" width="${Math.round(w*.15)}" height="${Math.round(h*.12)}" rx="1" fill="rgba(0,0,0,.12)"/>
+    </svg>`;
+  }
+  if(t==='liberty'){
+    const w=Math.max(18,Math.round(h*.22));const cx=Math.round(w/2);
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <rect x="${cx-4}" y="${Math.round(h*.8)}" width="8" height="${Math.round(h*.2)}" fill="${c}" opacity=".5"/>
+    <rect x="${cx-9}" y="${Math.round(h*.42)}" width="18" height="${Math.round(h*.38)}" rx="2" fill="${c}" opacity=".72"/>
+    <rect x="${cx-11}" y="${Math.round(h*.34)}" width="22" height="${Math.round(h*.1)}" rx="1" fill="${c}" opacity=".6"/>
+    <ellipse cx="${cx}" cy="${Math.round(h*.28)}" rx="9" ry="${Math.round(h*.07)}" fill="${c}" opacity=".85"/>
+    <polygon points="${cx},0 ${cx+4},${Math.round(h*.06)} ${cx-4},${Math.round(h*.06)}" fill="${c}"/>
+    <rect x="${cx+6}" y="${Math.round(h*.18)}" width="${Math.round(h*.04)}" height="${Math.round(h*.14)}" rx="1" fill="${c}" opacity=".7" transform="rotate(-20,${cx+6},${Math.round(h*.18)})"/>
+    </svg>`;
+  }
+  if(t==='eiffel'){
+    const w=Math.max(20,Math.round(h*.28));const cx=Math.round(w/2);
+    const a1=Math.round(h*.06);const a2=Math.round(h*.22);
+    const a3=Math.round(h*.44);const a4=Math.round(h*.7);
+    const t1l=Math.round(w*.32);const t1r=Math.round(w*.68);
+    const t2l=Math.round(w*.18);const t2r=Math.round(w*.82);
+    const t3l=Math.round(w*.06);const t3r=Math.round(w*.94);
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <line x1="${cx}" y1="0" x2="${cx}" y2="${a1}" stroke="${c}" stroke-width="1.5"/>
+    <polygon points="${cx},${a1} ${t1l},${a2} ${t1r},${a2}" fill="${c}" opacity=".9"/>
+    <rect x="${t1l}" y="${a2}" width="${t1r-t1l}" height="${Math.round(h*.04)}" fill="${c}" opacity=".7"/>
+    <polygon points="${t1l},${a2+Math.round(h*.04)} ${t2l},${a3} ${t2r},${a3} ${t1r},${a2+Math.round(h*.04)}" fill="${c}" opacity=".75"/>
+    <rect x="${t2l}" y="${a3}" width="${t2r-t2l}" height="${Math.round(h*.04)}" fill="${c}" opacity=".65"/>
+    <polygon points="${t2l},${a3+Math.round(h*.04)} ${t3l},${a4} ${t3r},${a4} ${t2r},${a3+Math.round(h*.04)}" fill="${c}" opacity=".7"/>
+    <rect x="${t3l}" y="${a4}" width="${t3r-t3l}" height="${Math.round(h*.06)}" rx="2" fill="${c}" opacity=".6"/>
+    <polygon points="${t3l},${a4+Math.round(h*.06)} 0,${h} ${w},${h} ${t3r},${a4+Math.round(h*.06)}" fill="${c}" opacity=".65"/>
+    <rect x="${cx-3}" y="${Math.round(h*.02)}" width="6" height="${Math.round(h*.04)}" rx="1" fill="${c}" opacity=".6"/>
+    </svg>`;
+  }
+  if(t==='falls'){
+    const w=Math.max(26,Math.round(h*.34));const ds=Math.round(h*.22);const dropH=h-ds;
+    const streams=5;const sw=Math.round(w/(streams*2.4));let lines='';
+    const heights=[.65,.82,.58,.75,.7];
+    for(let i=0;i<streams;i++){
+      const x=Math.round(w*.08+i*(w*.82/streams));
+      const sh=Math.round(dropH*heights[i]);
+      lines+=`<rect x="${x}" y="${ds}" width="${sw}" height="${sh}" rx="${Math.round(sw/2)}" fill="${c}" opacity=".65"/>`;
+    }
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <rect x="0" y="0" width="${w}" height="${ds+4}" rx="3" fill="${c}" opacity=".7"/>
+    <rect x="0" y="${ds}" width="${w}" height="${h-ds}" rx="2" fill="${c}" opacity=".2"/>
+    ${lines}
+    <ellipse cx="${Math.round(w/2)}" cy="${h-4}" rx="${Math.round(w*.38)}" ry="5" fill="${c}" opacity=".35"/>
+    </svg>`;
+  }
+  return personSVG(h,c,item.w);
+}
+
+function render(cat){
+  const stage=document.getElementById('stage');
+  const items=cats[cat];
+  stage.innerHTML='';
+  if(cat==='wingspan'){
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;flex-direction:column;gap:14px;padding:4px 0';
+    items.forEach(item=>{
+      const row=document.createElement('div');row.className='wing-row';
+      const len=Math.round(item.in*1.9);const th=item.w?22:13;
+      const svgEl=document.createElement('div');
+      svgEl.innerHTML=`<svg width="${len}" height="${th+4}" viewBox="0 0 ${len} ${th+4}">
+        <rect x="0" y="2" width="${len}" height="${th}" rx="3" fill="${item.c}" opacity="${item.w?1:.7}"/>
+        ${item.w?`<line x1="2" y1="0" x2="2" y2="${th+4}" stroke="${item.c}" stroke-width="2"/>
+        <line x1="${len-2}" y1="0" x2="${len-2}" y2="${th+4}" stroke="${item.c}" stroke-width="2"/>`:''}
+      </svg>`;
+      svgEl.style.flexShrink='0';
+      const lbl=document.createElement('div');lbl.className=`wing-lbl${item.w?' gold':''}`;
+      lbl.innerHTML=`<b>${item.n}</b>${item.lbl}`;
+      row.appendChild(svgEl);row.appendChild(lbl);div.appendChild(row);
+    });
+    stage.appendChild(div);return;
+  }
+  const maxIn=Math.max(...items.map(i=>i.in));
+  const MAX_H=cat==='landmarks'?310:280;
+  const scale=Math.min(2.6,MAX_H/maxIn);
+  const containerH=Math.round(maxIn*scale)+44;
+  const canvas=document.createElement('div');
+  canvas.className='canvas';
+  canvas.style.minHeight=containerH+'px';
+  canvas.style.paddingBottom='28px';
+  items.forEach(item=>{
+    const fig=document.createElement('div');fig.className='fig';
+    const tip=document.createElement('div');tip.className='tip';tip.textContent=item.tip;
+    const body=document.createElement('div');
+    body.style.cssText=`display:flex;align-items:flex-end;justify-content:center;height:${Math.round(maxIn*scale)}px`;
+    const h=Math.round(item.in*scale);
+    body.innerHTML=objSVG(item,h);
+    const lbl=document.createElement('div');lbl.className=`fig-label${item.w?' gold':''}`;
+    lbl.innerHTML=`<b>${item.n}</b>${item.lbl}`;
+    fig.appendChild(tip);fig.appendChild(body);fig.appendChild(lbl);canvas.appendChild(fig);
+  });
+  const ground=document.createElement('div');ground.className='ground-line';canvas.appendChild(ground);
+  stage.appendChild(canvas);
+}
+
+document.getElementById('tabs').addEventListener('click',e=>{
+  const b=e.target.closest('.tab');if(!b)return;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  b.classList.add('on');render(b.dataset.cat);
+});
+render('players');
+</script>
+</body>
+</html>
