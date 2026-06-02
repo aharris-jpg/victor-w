@@ -19,18 +19,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tab{padding:5px 13px;border-radius:20px;border:1px solid #ccc;background:#fff;color:#666;font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit}
 .tab.on{background:#B6842D;border-color:#B6842D;color:#fff}
 .tab:hover:not(.on){background:#f5f4f0}
-.stage{padding:24px 20px 20px;background:#fff}
-.canvas{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:18px}
-.ground-line{position:absolute;bottom:0;left:0;right:0;height:1.5px;background:#ddd}
-.fig{display:flex;flex-direction:column;align-items:center;cursor:default;position:relative;flex-shrink:0}
-.fig svg{display:block}
-.fig-label{margin-top:8px;font-size:11px;color:#888;text-align:center;line-height:1.5;max-width:80px}
-.fig-label b{display:block;font-size:11px;font-weight:600;color:#222}
-.fig-label.gold b{color:#B6842D}
+.stage{padding:24px 20px 8px;background:#fff}
+.ground-line{height:1.5px;background:#ddd;margin:0 0 6px}
+.canvas{display:flex;align-items:flex-end;justify-content:center;gap:20px}
+.fig{display:flex;flex-direction:column;align-items:center;position:relative;flex-shrink:0}
+.fig-spacer{flex-shrink:0}
+.tip-wrap{position:relative;cursor:default}
+.tip-wrap:hover .tip{opacity:1}
+.tip{position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:#1a2535;color:#fff;padding:7px 11px;border-radius:6px;font-size:11px;white-space:nowrap;z-index:20;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(182,132,45,.4)}
+.tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:#1a2535}
+.fig-label{margin-top:8px;font-size:10px;color:#888;text-align:center;line-height:1.4;white-space:nowrap}
+.fig-label b{display:block;font-size:10px;font-weight:600;color:#333}
+.fig-label.gold b{color:#B6842D;font-size:10px}
 .wemby-count{display:block;font-size:10px;color:#B6842D;font-weight:600;margin-top:2px;white-space:nowrap}
-.tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a2535;color:#fff;padding:7px 11px;border-radius:6px;font-size:11px;white-space:nowrap;z-index:20;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(182,132,45,.4)}
-.tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a2535}
-.fig:hover .tip{opacity:1}
+.wing-wrap{padding:8px 0}
+.wing-row{display:flex;align-items:center;gap:12px;padding:5px 0}
+.wing-lbl{font-size:11px;color:#888;line-height:1.35}
+.wing-lbl b{display:block;font-weight:600;font-size:11px;color:#333}
+.wing-lbl.gold b{color:#B6842D}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#eee;border-top:1px solid #eee}
 .stat{background:#fff;padding:10px 14px}
 .stat-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.05em}
@@ -40,11 +46,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .foot span{font-size:10px;color:#999}
 .foot a{font-size:10px;color:#B6842D;text-decoration:none;font-weight:600;letter-spacing:.04em}
 .foot a:hover{text-decoration:underline}
-.wing-row{display:flex;align-items:center;gap:12px;padding:4px 0}
-.wing-row svg{display:block;flex-shrink:0}
-.wing-lbl{font-size:11px;color:#888;line-height:1.35}
-.wing-lbl b{display:block;font-weight:600;font-size:11px;color:#222}
-.wing-lbl.gold b{color:#B6842D}
 </style>
 </head>
 <body>
@@ -79,214 +80,342 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 
 <script>
-const GOLD='#B6842D',DARK='#3d3d3d',MID='#7a7a7a',LITE='#b0b0b0';
-const WEMBY_IN=88;
+const GOLD='#B6842D', DARK='#444', MID='#888', LITE='#bbb';
+const SCALE = 2.6;
 
-const cats={
-  players:[
-    {n:"Muggsy Bogues",in:63,lbl:"5'3\"",tip:"Shortest-ever NBA player",c:LITE},
-    {n:"Avg US man",in:69,lbl:"5'9\"",tip:"Average American male height",c:LITE},
-    {n:"LeBron James",in:81,lbl:"6'9\"",tip:"4× NBA champion",c:MID},
-    {n:"Giannis",in:83,lbl:"6'11\"",tip:"Milwaukee Bucks franchise star",c:MID},
-    {n:"Chet Holmgren",in:85,lbl:"7'1\"",tip:"OKC Thunder centre",c:MID},
-    {n:"Wembanyama",in:88,lbl:"7'4\"",tip:"Wingspan 8'0\" · Reach 9'9\"",c:GOLD,w:true},
-    {n:"Manute Bol",in:91,lbl:"7'7\"",tip:"Tallest NBA player ever recorded",c:DARK},
+const cats = {
+  players: [
+    {n:'Muggsy Bogues', in:63,  lbl:"5'3\"",  tip:'Shortest-ever NBA player',         c:LITE},
+    {n:'Avg US man',    in:69,  lbl:"5'9\"",  tip:'Average American male height',     c:LITE},
+    {n:'LeBron James',  in:81,  lbl:"6'9\"",  tip:'4× NBA champion',                  c:MID},
+    {n:'Giannis',       in:83,  lbl:"6'11\"", tip:'Milwaukee Bucks franchise star',   c:MID},
+    {n:'Chet Holmgren', in:85,  lbl:"7'1\"",  tip:'OKC Thunder centre',               c:MID},
+    {n:'Wembanyama',    in:88,  lbl:"7'4\"",  tip:"Wingspan 8'0\" · Reach 9'9\"",    c:GOLD, w:true},
+    {n:'Manute Bol',    in:91,  lbl:"7'7\"",  tip:'Tallest NBA player ever recorded', c:DARK},
   ],
-  everyday:[
-    {n:"Standard door",in:80,lbl:"6'8\"",tip:"US interior door height",c:MID,t:'door'},
-    {n:"NBA rim",in:120,lbl:"10'0\"",tip:"Wemby's reach is just 3\" short flat-footed",c:MID,t:'rim'},
-    {n:"Double-decker bus",in:175,lbl:"14'7\"",tip:"London double-decker bus height",c:DARK,t:'bus'},
-    {n:"Wembanyama",in:88,lbl:"7'4\"",tip:"Can almost touch the rim standing still",c:GOLD,w:true,t:'person'},
+  everyday: [
+    {n:'Standard door',      in:80,  lbl:"6'8\"",  tip:'US interior door height',               c:MID,  t:'door'},
+    {n:'Wembanyama',         in:88,  lbl:"7'4\"",  tip:"Can almost touch the rim standing still",c:GOLD, t:'person', w:true},
+    {n:'NBA rim',            in:120, lbl:"10'0\"",  tip:"Wemby's reach is just 3\" short",        c:MID,  t:'rim'},
+    {n:'Double-decker bus',  in:175, lbl:"14'7\"",  tip:'London double-decker bus height',        c:DARK, t:'bus'},
   ],
-  landmarks:[
-    {n:"Wembanyama",in:88,lbl:"7'4\"",tip:"That's 1× Wembanyama — the baseline",c:GOLD,w:true,t:'person',count:1},
-    {n:"Stonehenge",in:252,lbl:"21'0\"",tip:"Tallest upright stone at Stonehenge",c:'#8b7355',t:'stonehenge',count:3},
-    {n:"Niagara Falls",in:2040,lbl:"170'0\"",tip:"Height of the falls — 23 Wembanyamas stacked",c:'#5b8fa8',t:'falls',count:23},
-    {n:"Statue of Liberty",in:1860,lbl:"155'0\"",tip:"Ground to torch — 21 Wembanyamas stacked",c:'#8aab9c',t:'liberty',count:21},
-    {n:"Eiffel Tower",in:12996,lbl:"1,083 ft",tip:"Full height to antenna tip — 147 Wembanyamas stacked",c:'#607080',t:'eiffel',count:147},
+  landmarks: [
+    {n:'Wembanyama',       in:88,   lbl:"7'4\"",   tip:'224 cm — the baseline',                          c:GOLD,     t:'person', w:true, count:1},
+    {n:'Stonehenge',       in:252,  lbl:"21'0\"",   tip:'Tallest upright stone at Stonehenge',            c:'#8b7355', t:'stonehenge', count:3},
+    {n:'Statue of Liberty',in:1860, lbl:"155'0\"",  tip:'Ground to torch — 21 Wembanyamas stacked',       c:'#8aab9c', t:'liberty', count:21},
+    {n:'Niagara Falls',    in:2040, lbl:"170'0\"",  tip:'Height of the falls — 23 Wembanyamas stacked',   c:'#5b8fa8', t:'falls', count:23},
+    {n:'Eiffel Tower',     in:12996,lbl:"1,083 ft", tip:'Full height to antenna — 147 Wembanyamas stacked',c:'#607080', t:'eiffel', count:147},
   ],
-  wingspan:[
-    {n:"Car width",in:73,lbl:"~6'1\"",tip:"Typical sedan width: ~73 inches",c:LITE,hz:true},
-    {n:"King-size bed",in:80,lbl:"80\" long",tip:"Wingspan clears both ends by 16 inches",c:MID,hz:true},
-    {n:"Avg NBA wingspan",in:83,lbl:"6'11\"",tip:"League-average wingspan across all positions",c:DARK,hz:true},
-    {n:"Wembanyama wingspan",in:96,lbl:"8'0\"",tip:"Widest wingspan recorded at NBA draft combine",c:GOLD,w:true,hz:true},
+  wingspan: [
+    {n:'Standard car width',      in:73, lbl:'73" wide',    tip:'Typical sedan width: ~73 inches',               c:LITE, type:'car'},
+    {n:'King-size bed length',     in:80, lbl:'80" long',    tip:'Wingspan clears both ends by 16 inches',        c:MID,  type:'bed'},
+    {n:'Average NBA wingspan',     in:83, lbl:'6ft 11in avg',  tip:'League-average wingspan across all positions',  c:DARK, type:'arms'},
+    {n:'Wembanyama wingspan',      in:96, lbl:'8ft 0in',       tip:'Widest wingspan recorded at NBA draft combine', c:GOLD, w:true, type:'wemby'},
   ]
 };
 
-function personSVG(h,c,isW){
-  const w=Math.max(14,Math.round(h*.26));
-  const hr=Math.max(4,Math.round(w*.36));
-  const bH=Math.round(h*.5);const lH=Math.round(h*.38);
-  const cx=Math.round(w/2);const hY=hr;
-  const bT=hr*2+2;const bB=bT+bH;
-  const aw=isW?2.5:1.8;
-  const ax1=Math.round(w*.04);const ax2=Math.round(w*.96);
-  const aY=bT+Math.round(bH*.38);
-  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-  <circle cx="${cx}" cy="${hY}" r="${hr}" fill="${c}"/>
-  <rect x="${cx-Math.round(w*.16)}" y="${bT}" width="${Math.round(w*.32)}" height="${bH}" rx="2" fill="${c}"/>
-  <rect x="${cx-Math.round(w*.16)}" y="${bB-2}" width="${Math.round(w*.13)}" height="${lH}" rx="2" fill="${c}"/>
-  <rect x="${cx+3}" y="${bB-2}" width="${Math.round(w*.13)}" height="${lH}" rx="2" fill="${c}"/>
-  <line x1="${cx}" y1="${bT+6}" x2="${ax1}" y2="${aY}" stroke="${c}" stroke-width="${aw}" stroke-linecap="round"/>
-  <line x1="${cx}" y1="${bT+6}" x2="${ax2}" y2="${aY}" stroke="${c}" stroke-width="${aw}" stroke-linecap="round"/>
+// ── PERSON SVG ── fixed proportions, only height varies
+function personSVG(H, color, isW) {
+  const headR = Math.max(5, Math.round(H * 0.095));
+  const headCY = headR;
+  const neckY = headR * 2 + 2;
+  const bodyH = Math.round(H * 0.46);
+  const legH = H - neckY - bodyH;
+  const W = Math.max(16, headR * 2 + 6);
+  const cx = Math.round(W / 2);
+  const bx = cx - Math.round(W * 0.22);
+  const bw = Math.round(W * 0.44);
+  const lw = Math.round(bw * 0.44);
+  const ay1 = neckY + Math.round(bodyH * 0.15);
+  const ay2 = neckY + Math.round(bodyH * 0.55);
+  const sw = isW ? 2.2 : 1.5;
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;overflow:visible">
+    <circle cx="${cx}" cy="${headCY}" r="${headR}" fill="${color}"/>
+    <rect x="${bx}" y="${neckY}" width="${bw}" height="${bodyH}" rx="2" fill="${color}"/>
+    <rect x="${bx}" y="${neckY+bodyH-1}" width="${lw}" height="${legH+1}" rx="2" fill="${color}"/>
+    <rect x="${bx+bw-lw}" y="${neckY+bodyH-1}" width="${lw}" height="${legH+1}" rx="2" fill="${color}"/>
+    <line x1="${cx}" y1="${ay1}" x2="1" y2="${ay2}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${ay1}" x2="${W-1}" y2="${ay2}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
   </svg>`;
 }
 
-function objSVG(item,h){
-  const t=item.t||'person';const c=item.c;
-  if(t==='person') return personSVG(h,c,item.w);
-  if(t==='door'){
-    const w=Math.max(20,Math.round(h*.42));
-    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-    <rect x="1" y="0" width="${w-2}" height="${h}" rx="2" fill="${c}" opacity=".85"/>
-    <rect x="3" y="2" width="${Math.round((w-6)*.48)}" height="${Math.round(h*.28)}" rx="1" fill="rgba(255,255,255,.18)"/>
-    <rect x="${Math.round(w*.53)}" y="2" width="${Math.round((w-6)*.44)}" height="${Math.round(h*.28)}" rx="1" fill="rgba(255,255,255,.18)"/>
-    <circle cx="${w-8}" cy="${Math.round(h*.6)}" r="3" fill="rgba(255,255,255,.5)"/>
+// ── OBJECT SVGs — each returns svg string at given pixel height H
+function objSVG(item, H) {
+  const t = item.t || 'person';
+  const c = item.c;
+  if (t === 'person') return personSVG(H, c, item.w);
+
+  if (t === 'door') {
+    const W = Math.max(20, Math.round(H * 0.42));
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">
+    <rect x="1" y="0" width="${W-2}" height="${H}" rx="2" fill="${c}" opacity=".85"/>
+    <rect x="3" y="2" width="${Math.round((W-6)*.48)}" height="${Math.round(H*.28)}" rx="1" fill="rgba(255,255,255,.18)"/>
+    <rect x="${Math.round(W*.53)}" y="2" width="${Math.round((W-6)*.44)}" height="${Math.round(H*.28)}" rx="1" fill="rgba(255,255,255,.18)"/>
+    <circle cx="${W-8}" cy="${Math.round(H*.6)}" r="3" fill="rgba(255,255,255,.5)"/>
     </svg>`;
   }
-  if(t==='rim'){
-    const w=44;const rimH=Math.round(10*(h/item.in));const postH=h-rimH;
-    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-    <rect x="20" y="0" width="4" height="${postH}" fill="${c}" opacity=".5"/>
-    <rect x="6" y="${postH-20}" width="${w-12}" height="14" rx="2" fill="${c}" opacity=".8"/>
-    <rect x="8" y="${postH-18}" width="${w-16}" height="10" rx="1" fill="rgba(255,255,255,.15)"/>
-    <ellipse cx="${w/2}" cy="${postH}" rx="13" ry="4" fill="none" stroke="${c}" stroke-width="2.5"/>
-    <line x1="${w/2}" y1="${postH+4}" x2="${w/2}" y2="${postH+16}" stroke="${c}" stroke-width="2" stroke-linecap="round"/>
+
+  if (t === 'rim') {
+    const W = 44;
+    // Pole goes full height. Backboard sits near the top. Rim is at the top of the pole.
+    const rimY = Math.round(H * 0.08); // rim sits near top of SVG
+    const boardH = Math.round(H * 0.18);
+    const boardW = W - 8;
+    const boardX = 4;
+    const boardY = Math.round(rimY - boardH * 0.6);
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">
+    <rect x="20" y="${rimY}" width="4" height="${H - rimY}" fill="${c}" opacity=".5"/>
+    <rect x="${boardX}" y="${Math.max(0,boardY)}" width="${boardW}" height="${boardH}" rx="2" fill="${c}" opacity=".8"/>
+    <rect x="${boardX+2}" y="${Math.max(2,boardY+2)}" width="${boardW-4}" height="${boardH-4}" rx="1" fill="rgba(255,255,255,.15)"/>
+    <ellipse cx="${W/2}" cy="${rimY}" rx="13" ry="4" fill="none" stroke="${c}" stroke-width="2.5"/>
     </svg>`;
   }
-  if(t==='bus'){
-    const w=Math.max(36,Math.round(h*.4));const bH=h-12;const midY=Math.round(bH*.44);
-    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-    <rect x="3" y="0" width="${w-6}" height="${bH}" rx="5" fill="${c}" opacity=".75"/>
-    <rect x="3" y="${midY}" width="${w-6}" height="2" fill="rgba(255,255,255,.25)"/>
-    <rect x="8" y="5" width="${Math.round((w-20)/2.2)}" height="${Math.round(midY*.7)}" rx="1" fill="rgba(255,255,255,.3)"/>
-    <rect x="${Math.round(w/2)}" y="5" width="${Math.round((w-20)/2.2)}" height="${Math.round(midY*.7)}" rx="1" fill="rgba(255,255,255,.3)"/>
-    <rect x="8" y="${midY+5}" width="${Math.round((w-20)/2.2)}" height="${Math.round(midY*.65)}" rx="1" fill="rgba(255,255,255,.3)"/>
-    <rect x="${Math.round(w/2)}" y="${midY+5}" width="${Math.round((w-20)/2.2)}" height="${Math.round(midY*.65)}" rx="1" fill="rgba(255,255,255,.3)"/>
-    <circle cx="14" cy="${h-4}" r="6" fill="${c}"/>
-    <circle cx="14" cy="${h-4}" r="3" fill="rgba(0,0,0,.2)"/>
-    <circle cx="${w-14}" cy="${h-4}" r="6" fill="${c}"/>
-    <circle cx="${w-14}" cy="${h-4}" r="3" fill="rgba(0,0,0,.2)"/>
+
+  if (t === 'bus') {
+    const W = Math.max(36, Math.round(H * 0.4));
+    const bH = H - 12;
+    const midY = Math.round(bH * 0.44);
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">
+    <rect x="3" y="0" width="${W-6}" height="${bH}" rx="5" fill="${c}" opacity=".75"/>
+    <rect x="3" y="${midY}" width="${W-6}" height="2" fill="rgba(255,255,255,.25)"/>
+    <rect x="8" y="5" width="${Math.round((W-20)/2.2)}" height="${Math.round(midY*.7)}" rx="1" fill="rgba(255,255,255,.3)"/>
+    <rect x="${Math.round(W/2)}" y="5" width="${Math.round((W-20)/2.2)}" height="${Math.round(midY*.7)}" rx="1" fill="rgba(255,255,255,.3)"/>
+    <rect x="8" y="${midY+5}" width="${Math.round((W-20)/2.2)}" height="${Math.round(midY*.65)}" rx="1" fill="rgba(255,255,255,.3)"/>
+    <rect x="${Math.round(W/2)}" y="${midY+5}" width="${Math.round((W-20)/2.2)}" height="${Math.round(midY*.65)}" rx="1" fill="rgba(255,255,255,.3)"/>
+    <circle cx="14" cy="${H-4}" r="6" fill="${c}"/>
+    <circle cx="14" cy="${H-4}" r="3" fill="rgba(0,0,0,.2)"/>
+    <circle cx="${W-14}" cy="${H-4}" r="6" fill="${c}"/>
+    <circle cx="${W-14}" cy="${H-4}" r="3" fill="rgba(0,0,0,.2)"/>
     </svg>`;
   }
-  if(t==='stonehenge'){
-    const w=Math.max(18,Math.round(h*.32));const capH=Math.max(6,Math.round(h*.08));
-    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-    <rect x="${Math.round(w*.2)}" y="${capH}" width="${Math.round(w*.6)}" height="${h-capH}" rx="2" fill="${c}" opacity=".85"/>
-    <rect x="0" y="0" width="${w}" height="${capH}" rx="2" fill="${c}"/>
-    <rect x="${Math.round(w*.28)}" y="${capH+4}" width="${Math.round(w*.15)}" height="${Math.round(h*.12)}" rx="1" fill="rgba(0,0,0,.12)"/>
+
+  if (t === 'stonehenge') {
+    const W = Math.max(18, Math.round(H * 0.32));
+    const capH = Math.max(6, Math.round(H * 0.08));
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">
+    <rect x="${Math.round(W*.2)}" y="${capH}" width="${Math.round(W*.6)}" height="${H-capH}" rx="2" fill="${c}" opacity=".85"/>
+    <rect x="0" y="0" width="${W}" height="${capH}" rx="2" fill="${c}"/>
     </svg>`;
   }
-  if(t==='liberty'){
-    const w=Math.max(18,Math.round(h*.22));const cx=Math.round(w/2);
-    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-    <rect x="${cx-4}" y="${Math.round(h*.8)}" width="8" height="${Math.round(h*.2)}" fill="${c}" opacity=".5"/>
-    <rect x="${cx-9}" y="${Math.round(h*.42)}" width="18" height="${Math.round(h*.38)}" rx="2" fill="${c}" opacity=".72"/>
-    <rect x="${cx-11}" y="${Math.round(h*.34)}" width="22" height="${Math.round(h*.1)}" rx="1" fill="${c}" opacity=".6"/>
-    <ellipse cx="${cx}" cy="${Math.round(h*.28)}" rx="9" ry="${Math.round(h*.07)}" fill="${c}" opacity=".85"/>
-    <polygon points="${cx},0 ${cx+4},${Math.round(h*.06)} ${cx-4},${Math.round(h*.06)}" fill="${c}"/>
-    <rect x="${cx+6}" y="${Math.round(h*.18)}" width="${Math.round(h*.04)}" height="${Math.round(h*.14)}" rx="1" fill="${c}" opacity=".7" transform="rotate(-20,${cx+6},${Math.round(h*.18)})"/>
+
+  if (t === 'liberty') {
+    const W = Math.max(18, Math.round(H * 0.22));
+    const cx = Math.round(W / 2);
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">
+    <rect x="${cx-4}" y="${Math.round(H*.8)}" width="8" height="${Math.round(H*.2)}" fill="${c}" opacity=".5"/>
+    <rect x="${cx-9}" y="${Math.round(H*.42)}" width="18" height="${Math.round(H*.38)}" rx="2" fill="${c}" opacity=".72"/>
+    <rect x="${cx-11}" y="${Math.round(H*.34)}" width="22" height="${Math.round(H*.1)}" rx="1" fill="${c}" opacity=".6"/>
+    <ellipse cx="${cx}" cy="${Math.round(H*.28)}" rx="9" ry="${Math.round(H*.07)}" fill="${c}" opacity=".85"/>
+    <polygon points="${cx},0 ${cx+4},${Math.round(H*.06)} ${cx-4},${Math.round(H*.06)}" fill="${c}"/>
     </svg>`;
   }
-  if(t==='eiffel'){
-    const w=Math.max(20,Math.round(h*.28));const cx=Math.round(w/2);
-    const a1=Math.round(h*.06);const a2=Math.round(h*.22);
-    const a3=Math.round(h*.44);const a4=Math.round(h*.7);
-    const t1l=Math.round(w*.32);const t1r=Math.round(w*.68);
-    const t2l=Math.round(w*.18);const t2r=Math.round(w*.82);
-    const t3l=Math.round(w*.06);const t3r=Math.round(w*.94);
-    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+
+  if (t === 'eiffel') {
+    const W = Math.max(20, Math.round(H * 0.28));
+    const cx = Math.round(W / 2);
+    const a1=Math.round(H*.06), a2=Math.round(H*.22), a3=Math.round(H*.44), a4=Math.round(H*.7);
+    const t1l=Math.round(W*.32), t1r=Math.round(W*.68);
+    const t2l=Math.round(W*.18), t2r=Math.round(W*.82);
+    const t3l=Math.round(W*.06), t3r=Math.round(W*.94);
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">
     <line x1="${cx}" y1="0" x2="${cx}" y2="${a1}" stroke="${c}" stroke-width="1.5"/>
     <polygon points="${cx},${a1} ${t1l},${a2} ${t1r},${a2}" fill="${c}" opacity=".9"/>
-    <rect x="${t1l}" y="${a2}" width="${t1r-t1l}" height="${Math.round(h*.04)}" fill="${c}" opacity=".7"/>
-    <polygon points="${t1l},${a2+Math.round(h*.04)} ${t2l},${a3} ${t2r},${a3} ${t1r},${a2+Math.round(h*.04)}" fill="${c}" opacity=".75"/>
-    <rect x="${t2l}" y="${a3}" width="${t2r-t2l}" height="${Math.round(h*.04)}" fill="${c}" opacity=".65"/>
-    <polygon points="${t2l},${a3+Math.round(h*.04)} ${t3l},${a4} ${t3r},${a4} ${t2r},${a3+Math.round(h*.04)}" fill="${c}" opacity=".7"/>
-    <rect x="${t3l}" y="${a4}" width="${t3r-t3l}" height="${Math.round(h*.06)}" rx="2" fill="${c}" opacity=".6"/>
-    <polygon points="${t3l},${a4+Math.round(h*.06)} 0,${h} ${w},${h} ${t3r},${a4+Math.round(h*.06)}" fill="${c}" opacity=".65"/>
-    <rect x="${cx-3}" y="${Math.round(h*.02)}" width="6" height="${Math.round(h*.04)}" rx="1" fill="${c}" opacity=".6"/>
+    <rect x="${t1l}" y="${a2}" width="${t1r-t1l}" height="${Math.round(H*.04)}" fill="${c}" opacity=".7"/>
+    <polygon points="${t1l},${a2+Math.round(H*.04)} ${t2l},${a3} ${t2r},${a3} ${t1r},${a2+Math.round(H*.04)}" fill="${c}" opacity=".75"/>
+    <rect x="${t2l}" y="${a3}" width="${t2r-t2l}" height="${Math.round(H*.04)}" fill="${c}" opacity=".65"/>
+    <polygon points="${t2l},${a3+Math.round(H*.04)} ${t3l},${a4} ${t3r},${a4} ${t2r},${a3+Math.round(H*.04)}" fill="${c}" opacity=".7"/>
+    <rect x="${t3l}" y="${a4}" width="${t3r-t3l}" height="${Math.round(H*.06)}" rx="2" fill="${c}" opacity=".6"/>
+    <polygon points="${t3l},${a4+Math.round(H*.06)} 0,${H} ${W},${H} ${t3r},${a4+Math.round(H*.06)}" fill="${c}" opacity=".65"/>
     </svg>`;
   }
-  if(t==='falls'){
-    const w=Math.max(26,Math.round(h*.34));const ds=Math.round(h*.22);const dropH=h-ds;
-    const streams=5;const sw=Math.round(w/(streams*2.4));let lines='';
-    const heights=[.65,.82,.58,.75,.7];
-    for(let i=0;i<streams;i++){
-      const x=Math.round(w*.08+i*(w*.82/streams));
-      const sh=Math.round(dropH*heights[i]);
-      lines+=`<rect x="${x}" y="${ds}" width="${sw}" height="${sh}" rx="${Math.round(sw/2)}" fill="${c}" opacity=".65"/>`;
+
+  if (t === 'falls') {
+    const W = Math.max(26, Math.round(H * 0.34));
+    const ds = Math.round(H * 0.22);
+    const dropH = H - ds;
+    const sw = Math.round(W / (5 * 2.4));
+    const hs = [.65,.82,.58,.75,.7];
+    let lines = '';
+    for (let i = 0; i < 5; i++) {
+      const x = Math.round(W*.08 + i*(W*.82/5));
+      lines += `<rect x="${x}" y="${ds}" width="${sw}" height="${Math.round(dropH*hs[i])}" rx="${Math.round(sw/2)}" fill="${c}" opacity=".65"/>`;
     }
-    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-    <rect x="0" y="0" width="${w}" height="${ds+4}" rx="3" fill="${c}" opacity=".7"/>
-    <rect x="0" y="${ds}" width="${w}" height="${h-ds}" rx="2" fill="${c}" opacity=".2"/>
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">
+    <rect x="0" y="0" width="${W}" height="${ds+4}" rx="3" fill="${c}" opacity=".7"/>
+    <rect x="0" y="${ds}" width="${W}" height="${H-ds}" rx="2" fill="${c}" opacity=".2"/>
     ${lines}
-    <ellipse cx="${Math.round(w/2)}" cy="${h-4}" rx="${Math.round(w*.38)}" ry="5" fill="${c}" opacity=".35"/>
+    <ellipse cx="${Math.round(W/2)}" cy="${H-4}" rx="${Math.round(W*.38)}" ry="5" fill="${c}" opacity=".35"/>
     </svg>`;
   }
-  return personSVG(h,c,item.w);
+
+  return personSVG(H, c, item.w);
 }
 
-function render(cat){
-  const stage=document.getElementById('stage');
-  const items=cats[cat];
-  stage.innerHTML='';
-  if(cat==='wingspan'){
-    const div=document.createElement('div');
-    div.style.cssText='display:flex;flex-direction:column;gap:14px;padding:4px 0';
-    items.forEach(item=>{
-      const row=document.createElement('div');row.className='wing-row';
-      const len=Math.round(item.in*1.9);const th=item.w?22:13;
-      const svgEl=document.createElement('div');
-      svgEl.innerHTML=`<svg width="${len}" height="${th+4}" viewBox="0 0 ${len} ${th+4}">
-        <rect x="0" y="2" width="${len}" height="${th}" rx="3" fill="${item.c}" opacity="${item.w?1:.7}"/>
-        ${item.w?`<line x1="2" y1="0" x2="2" y2="${th+4}" stroke="${item.c}" stroke-width="2"/>
-        <line x1="${len-2}" y1="0" x2="${len-2}" y2="${th+4}" stroke="${item.c}" stroke-width="2"/>`:''}
-      </svg>`;
-      svgEl.style.flexShrink='0';
-      const lbl=document.createElement('div');lbl.className=`wing-lbl${item.w?' gold':''}`;
-      lbl.innerHTML=`<b>${item.n}</b>${item.lbl}`;
-      row.appendChild(svgEl);row.appendChild(lbl);div.appendChild(row);
-    });
-    stage.appendChild(div);return;
-  }
-  const maxIn=Math.max(...items.map(i=>i.in));
-  const MAX_H=cat==='landmarks'?310:280;
-  const scale=Math.min(2.6,MAX_H/maxIn);
-  const containerH=Math.round(maxIn*scale)+44;
-  const canvas=document.createElement('div');
-  canvas.className='canvas';
-  canvas.style.minHeight=containerH+'px';
-  canvas.style.paddingBottom='28px';
-  items.forEach(item=>{
-    const fig=document.createElement('div');fig.className='fig';
-    const tip=document.createElement('div');tip.className='tip';tip.textContent=item.tip;
-    const body=document.createElement('div');
-    body.style.cssText=`display:flex;align-items:flex-end;justify-content:center;height:${Math.round(maxIn*scale)}px`;
-    const h=Math.round(item.in*scale);
-    body.innerHTML=objSVG(item,h);
-    const lbl=document.createElement('div');
-    lbl.className=`fig-label${item.w?' gold':''}`;
+// ── RENDER ──
+function render(cat) {
+  const stage = document.getElementById('stage');
+  stage.innerHTML = '';
 
-    if(cat==='landmarks' && item.count){
+  if (cat === 'wingspan') {
+    const WS = 4.8;
+    const wingItems = [...cats.wingspan].sort((a,b) => a.in - b.in);
+    const maxIn = Math.max(...wingItems.map(i => i.in));
+    const maxPx = maxIn * WS;
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'padding:16px 0;display:flex;flex-direction:column;gap:20px';
+
+    function wCar(cx,cy,W,c){
+      const bH=18,bX=cx-W/2,bY=cy-bH/2,rW=Math.round(W*.55),rH=10,rX=cx-rW/2,rY=bY-rH+4,wr=5,wY=bY+bH-3;
+      return `<rect x="${bX}" y="${bY}" width="${W}" height="${bH}" rx="4" fill="${c}" opacity=".75"/>
+      <rect x="${rX}" y="${rY}" width="${rW}" height="${rH+4}" rx="4" fill="${c}" opacity=".6"/>
+      <rect x="${rX+4}" y="${rY+2}" width="${rW-8}" height="${rH}" rx="2" fill="rgba(255,255,255,.2)"/>
+      <circle cx="${bX+wr+6}" cy="${wY}" r="${wr}" fill="#555" opacity=".5"/>
+      <circle cx="${bX+W-wr-6}" cy="${wY}" r="${wr}" fill="#555" opacity=".5"/>
+      <line x1="${bX}" y1="${cy+bH/2+4}" x2="${bX+W}" y2="${cy+bH/2+4}" stroke="${c}" stroke-width="1" opacity=".3"/>
+      <line x1="${bX}" y1="${cy+bH/2+4}" x2="${bX}" y2="${cy+bH/2+8}" stroke="${c}" stroke-width="1.5" opacity=".5"/>
+      <line x1="${bX+W}" y1="${cy+bH/2+4}" x2="${bX+W}" y2="${cy+bH/2+8}" stroke="${c}" stroke-width="1.5" opacity=".5"/>`;
+    }
+    function wBed(cx,cy,W,c){
+      const bH=36,bX=cx-W/2,bY=cy-bH/2,pW=Math.round(W*.28),pH=Math.round(bH*.28);
+      return `<rect x="${bX}" y="${bY}" width="${W}" height="${bH}" rx="4" fill="${c}" opacity=".2"/>
+      <rect x="${bX}" y="${bY}" width="${W}" height="${bH}" rx="4" fill="none" stroke="${c}" stroke-width="1.5" opacity=".5"/>
+      <rect x="${bX+4}" y="${bY+4}" width="${pW}" height="${pH}" rx="3" fill="${c}" opacity=".35"/>
+      <rect x="${bX+W-pW-4}" y="${bY+4}" width="${pW}" height="${pH}" rx="3" fill="${c}" opacity=".35"/>
+      <rect x="${bX+4}" y="${bY+bH-6}" width="${W-8}" height="4" rx="2" fill="${c}" opacity=".25"/>
+      <line x1="${bX}" y1="${cy+bH/2+5}" x2="${bX+W}" y2="${cy+bH/2+5}" stroke="${c}" stroke-width="1" opacity=".3"/>
+      <line x1="${bX}" y1="${cy+bH/2+5}" x2="${bX}" y2="${cy+bH/2+9}" stroke="${c}" stroke-width="1.5" opacity=".5"/>
+      <line x1="${bX+W}" y1="${cy+bH/2+5}" x2="${bX+W}" y2="${cy+bH/2+9}" stroke="${c}" stroke-width="1.5" opacity=".5"/>`;
+    }
+    function wArms(cx,cy,W,c){
+      const hw=W/2,th=5;
+      return `<rect x="${cx-hw}" y="${cy-th/2}" width="${W}" height="${th}" rx="${th/2}" fill="${c}" opacity=".5"/>
+      <circle cx="${cx-hw}" cy="${cy}" r="${th/2+1}" fill="${c}" opacity=".5"/>
+      <circle cx="${cx+hw}" cy="${cy}" r="${th/2+1}" fill="${c}" opacity=".5"/>
+      <circle cx="${cx}" cy="${cy}" r="5" fill="${c}" opacity=".4"/>
+      <line x1="${cx-hw}" y1="${cy+8}" x2="${cx+hw}" y2="${cy+8}" stroke="${c}" stroke-width="1" opacity=".3"/>
+      <line x1="${cx-hw}" y1="${cy+8}" x2="${cx-hw}" y2="${cy+12}" stroke="${c}" stroke-width="1.5" opacity=".5"/>
+      <line x1="${cx+hw}" y1="${cy+8}" x2="${cx+hw}" y2="${cy+12}" stroke="${c}" stroke-width="1.5" opacity=".5"/>`;
+    }
+    function wWemby(cx,cy,W,c){
+      const hw=W/2,at=8,bw=20,bh=26,hr=9,ay=cy+2;
+      return `<rect x="${cx-hw}" y="${ay-at/2}" width="${hw-bw/2}" height="${at}" rx="${at/2}" fill="${c}"/>
+      <rect x="${cx+bw/2}" y="${ay-at/2}" width="${hw-bw/2}" height="${at}" rx="${at/2}" fill="${c}"/>
+      <rect x="${cx-bw/2}" y="${cy-bh/2}" width="${bw}" height="${bh}" rx="5" fill="${c}"/>
+      <circle cx="${cx}" cy="${cy-bh/2-hr+3}" r="${hr}" fill="${c}"/>
+      <circle cx="${cx-hw}" cy="${ay}" r="4" fill="${c}"/>
+      <circle cx="${cx+hw}" cy="${ay}" r="4" fill="${c}"/>
+      <line x1="${cx-hw}" y1="${ay+at/2+5}" x2="${cx+hw}" y2="${ay+at/2+5}" stroke="${c}" stroke-width="1" opacity=".35"/>
+      <line x1="${cx-hw}" y1="${ay+at/2+5}" x2="${cx-hw}" y2="${ay+at/2+10}" stroke="${c}" stroke-width="2" opacity=".6"/>
+      <line x1="${cx+hw}" y1="${ay+at/2+5}" x2="${cx+hw}" y2="${ay+at/2+10}" stroke="${c}" stroke-width="2" opacity=".6"/>`;
+    }
+
+    const svgHts = {car:44, bed:60, arms:36, wemby:60};
+
+    wingItems.forEach(item => {
+      const W = item.in * WS;
+      const cx = maxPx / 2;
+      const svgH = svgHts[item.type];
+      const cy = svgH / 2 - 4;
+      let inner = '';
+      if(item.type==='car')   inner = wCar(cx,cy,W,item.c);
+      if(item.type==='bed')   inner = wBed(cx,cy,W,item.c);
+      if(item.type==='arms')  inner = wArms(cx,cy,W,item.c);
+      if(item.type==='wemby') inner = wWemby(cx,cy,W,item.c);
+      const svg = `<svg width="${maxPx}" height="${svgH}" viewBox="0 0 ${maxPx} ${svgH}" style="display:block">${inner}</svg>`;
+
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;flex-direction:column;gap:5px';
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'display:flex;justify-content:space-between;align-items:baseline';
+      const nameSpan = document.createElement('span');
+      nameSpan.style.cssText = `font-size:11px;font-weight:600;color:${item.w?'#B6842D':'#444'}`;
+      nameSpan.textContent = item.n;
+      const measSpan = document.createElement('span');
+      measSpan.style.cssText = 'font-size:10px;color:#aaa';
+      measSpan.textContent = item.lbl;
+      lbl.appendChild(nameSpan);
+      lbl.appendChild(measSpan);
+      const figWrap = document.createElement('div');
+      figWrap.innerHTML = svg;
+      row.appendChild(lbl);
+      row.appendChild(figWrap);
+      wrap.appendChild(row);
+    });
+
+    stage.appendChild(wrap);
+    return;
+  }
+
+  // sort shortest to tallest, keep landmarks in manual order
+  const items = cat === 'landmarks'
+    ? cats.landmarks
+    : [...cats[cat]].sort((a,b) => a.in - b.in);
+
+  const MAX_H = cat === 'landmarks' ? 310 : 280;
+  const maxIn = Math.max(...items.map(i => i.in));
+  const scale = Math.min(SCALE, MAX_H / maxIn);
+  const maxPx = maxIn * scale;
+
+  const canvas = document.createElement('div');
+  canvas.className = 'canvas';
+
+  items.forEach(item => {
+    const H = item.in * scale; // exact float — no rounding here
+
+    const fig = document.createElement('div');
+    fig.className = 'fig';
+
+    // spacer pushes figure down so base aligns to ground
+    const spacer = document.createElement('div');
+    spacer.className = 'fig-spacer';
+    spacer.style.height = (maxPx - H) + 'px';
+
+    const tipWrap = document.createElement('div');
+    tipWrap.className = 'tip-wrap';
+
+    const tip = document.createElement('div');
+    tip.className = 'tip';
+    tip.textContent = item.tip;
+
+    const figDiv = document.createElement('div');
+    figDiv.innerHTML = objSVG(item, Math.round(H));
+
+    tipWrap.appendChild(tip);
+    tipWrap.appendChild(figDiv);
+
+    const lbl = document.createElement('div');
+    lbl.className = `fig-label${item.w ? ' gold' : ''}`;
+
+    if (cat === 'landmarks' && item.count) {
       const countStr = item.w
         ? `<span class="wemby-count">= 1× Wemby</span>`
         : `<span class="wemby-count">= ${item.count}× Wemby</span>`;
-      lbl.innerHTML=`<b>${item.n}</b>${item.lbl}${countStr}`;
+      lbl.innerHTML = `<b>${item.n}</b>${item.lbl}${countStr}`;
     } else {
-      lbl.innerHTML=`<b>${item.n}</b>${item.lbl}`;
+      lbl.innerHTML = `<b>${item.n}</b>${item.lbl}`;
     }
 
-    fig.appendChild(tip);fig.appendChild(body);fig.appendChild(lbl);canvas.appendChild(fig);
+    fig.appendChild(spacer);
+    fig.appendChild(tipWrap);
+    fig.appendChild(lbl);
+    canvas.appendChild(fig);
   });
-  const ground=document.createElement('div');ground.className='ground-line';canvas.appendChild(ground);
+
+  const ground = document.createElement('div');
+  ground.className = 'ground-line';
+
   stage.appendChild(canvas);
+  stage.appendChild(ground);
 }
 
-document.getElementById('tabs').addEventListener('click',e=>{
-  const b=e.target.closest('.tab');if(!b)return;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  b.classList.add('on');render(b.dataset.cat);
+document.getElementById('tabs').addEventListener('click', e => {
+  const b = e.target.closest('.tab');
+  if (!b) return;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  b.classList.add('on');
+  render(b.dataset.cat);
 });
+
 render('players');
 </script>
 </body>
