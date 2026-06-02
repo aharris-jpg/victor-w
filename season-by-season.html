@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Wembanyama Season Stats — Vegas Insider</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;min-height:100vh}
+.card{width:100%;max-width:640px;border:1px solid #ddd;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+.gold-bar{height:4px;background:#B6842D}
+.hdr{background:#24324A;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hdr h1{color:#fff;font-size:15px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.hdr p{color:rgba(255,255,255,.5);font-size:11px;margin-top:3px}
+.hdr-logo{height:34px;border-radius:4px;flex-shrink:0}
+.legend{display:flex;gap:20px;padding:14px 24px;border-bottom:1px solid #eee;align-items:center}
+.leg{display:flex;align-items:center;gap:7px;font-size:12px;color:#555;font-weight:500}
+.leg-swatch{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+.chart{padding:20px 24px 24px}
+.stat-group{margin-bottom:22px}
+.stat-group:last-child{margin-bottom:0}
+.stat-label{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.row:last-child{margin-bottom:0}
+.season-tag{font-size:11px;color:#aaa;width:52px;flex-shrink:0;text-align:right}
+.bar-bg{flex:1;background:#f0ede8;border-radius:4px;height:22px;position:relative;overflow:hidden}
+.bar-fg{height:100%;border-radius:4px;position:absolute;left:0;top:0;transition:width .7s cubic-bezier(.22,1,.36,1);display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
+.bar-num{font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+.bar-num.outside{position:absolute;left:calc(100% + 6px);color:#555;font-weight:600}
+.divider{height:1px;background:#f0ede8;margin:22px 0}
+.foot{padding:9px 20px;background:#f9f8f5;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.foot span{font-size:10px;color:#999}
+.foot a{font-size:10px;color:#B6842D;text-decoration:none;font-weight:600;letter-spacing:.04em}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="gold-bar"></div>
+  <div class="hdr">
+    <div>
+      <h1>Wembanyama season by season</h1>
+      <p>Regular season averages · 2023-24 to 2025-26</p>
+    </div>
+    <a href="https://www.vegasinsider.com" target="_blank">
+      <img src="https://i.postimg.cc/RCWSWbzk/vegas-insider.jpg" class="hdr-logo" alt="Vegas Insider"/>
+    </a>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="leg-swatch" style="background:#c4a87a"></div>2023-24 · 71 games</div>
+    <div class="leg"><div class="leg-swatch" style="background:#9a7040"></div>2024-25 · 46 games</div>
+    <div class="leg"><div class="leg-swatch" style="background:#B6842D"></div>2025-26 · 59 games</div>
+  </div>
+
+  <div class="chart" id="chart"></div>
+
+  <div class="foot">
+    <span>NBA official box scores · regular season only</span>
+    <a href="https://www.vegasinsider.com" target="_blank">VEGASINSIDER.COM</a>
+  </div>
+</div>
+
+<script>
+const COLORS = ['#c4a87a','#9a7040','#B6842D'];
+const SEASONS = ['2023-24','2024-25','2025-26'];
+
+const groups = [
+  {
+    label: 'Points per game',
+    max: 28,
+    vals: [21.4, 24.3, 24.2],
+    unit: ''
+  },
+  {
+    label: 'Rebounds per game',
+    max: 14,
+    vals: [10.6, 11.0, 11.3],
+    unit: ''
+  },
+  {
+    label: 'Assists per game',
+    max: 6,
+    vals: [3.9, 3.7, 3.0],
+    unit: ''
+  },
+  {
+    label: 'Blocks per game',
+    max: 5,
+    vals: [3.6, 3.8, 3.1],
+    unit: ''
+  },
+  {
+    label: 'Field goal %',
+    max: 60,
+    vals: [46.4, 46.7, 50.6],
+    unit: '%'
+  },
+  {
+    label: 'Three-point %',
+    max: 45,
+    vals: [31.2, 33.9, 34.0],
+    unit: '%'
+  },
+  {
+    label: 'Free throw %',
+    max: 95,
+    vals: [78.1, 85.2, 81.5],
+    unit: '%'
+  },
+];
+
+const chart = document.getElementById('chart');
+
+groups.forEach((g, gi) => {
+  const group = document.createElement('div');
+  group.className = 'stat-group';
+
+  const lbl = document.createElement('div');
+  lbl.className = 'stat-label';
+  lbl.textContent = g.label;
+  group.appendChild(lbl);
+
+  g.vals.forEach((val, i) => {
+    const row = document.createElement('div');
+    row.className = 'row';
+
+    const tag = document.createElement('div');
+    tag.className = 'season-tag';
+    tag.textContent = SEASONS[i].replace('20','\'');
+
+    const bg = document.createElement('div');
+    bg.className = 'bar-bg';
+
+    const fg = document.createElement('div');
+    fg.className = 'bar-fg';
+    fg.style.background = COLORS[i];
+    fg.style.width = '0%';
+
+    const pct = (val / g.max) * 100;
+    const displayVal = val + g.unit;
+    const isShort = pct < 25;
+
+    const num = document.createElement('span');
+    num.className = isShort ? 'bar-num outside' : 'bar-num';
+    num.textContent = displayVal;
+
+    fg.appendChild(num);
+    bg.appendChild(fg);
+    row.appendChild(tag);
+    row.appendChild(bg);
+    group.appendChild(row);
+
+    setTimeout(() => {
+      fg.style.width = pct + '%';
+    }, 80 + gi * 60 + i * 40);
+  });
+
+  if (gi < groups.length - 1) {
+    const div = document.createElement('div');
+    div.className = 'divider';
+    group.appendChild(div);
+  }
+
+  chart.appendChild(group);
+});
+</script>
+</body>
+</html>
