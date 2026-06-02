@@ -24,9 +24,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ground-line{position:absolute;bottom:0;left:0;right:0;height:1.5px;background:#ddd}
 .fig{display:flex;flex-direction:column;align-items:center;cursor:default;position:relative;flex-shrink:0}
 .fig svg{display:block}
-.fig-label{margin-top:8px;font-size:11px;color:#888;text-align:center;line-height:1.35;max-width:72px}
+.fig-label{margin-top:8px;font-size:11px;color:#888;text-align:center;line-height:1.5;max-width:80px}
 .fig-label b{display:block;font-size:11px;font-weight:600;color:#222}
 .fig-label.gold b{color:#B6842D}
+.wemby-count{display:block;font-size:10px;color:#B6842D;font-weight:600;margin-top:2px;white-space:nowrap}
 .tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a2535;color:#fff;padding:7px 11px;border-radius:6px;font-size:11px;white-space:nowrap;z-index:20;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(182,132,45,.4)}
 .tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a2535}
 .fig:hover .tip{opacity:1}
@@ -79,6 +80,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <script>
 const GOLD='#B6842D',DARK='#3d3d3d',MID='#7a7a7a',LITE='#b0b0b0';
+const WEMBY_IN=88;
+
 const cats={
   players:[
     {n:"Muggsy Bogues",in:63,lbl:"5'3\"",tip:"Shortest-ever NBA player",c:LITE},
@@ -96,11 +99,11 @@ const cats={
     {n:"Wembanyama",in:88,lbl:"7'4\"",tip:"Can almost touch the rim standing still",c:GOLD,w:true,t:'person'},
   ],
   landmarks:[
-    {n:"Wembanyama",in:88,lbl:"7'4\"",tip:"224 cm of generational talent",c:GOLD,w:true,t:'person'},
-    {n:"Stonehenge",in:252,lbl:"21'0\"",tip:"Tallest upright stone at Stonehenge",c:'#8b7355',t:'stonehenge'},
-    {n:"Niagara Falls",in:2040,lbl:"170'0\"",tip:"About 23 Wembanyamas stacked",c:'#5b8fa8',t:'falls'},
-    {n:"Statue of Liberty",in:1860,lbl:"155'0\"",tip:"Ground to torch tip — 305 ft total",c:'#8aab9c',t:'liberty'},
-    {n:"Eiffel Tower",in:3937,lbl:"328'0\"",tip:"~450 Wembanyamas stacked — structural top",c:'#607080',t:'eiffel'},
+    {n:"Wembanyama",in:88,lbl:"7'4\"",tip:"That's 1× Wembanyama — the baseline",c:GOLD,w:true,t:'person',count:1},
+    {n:"Stonehenge",in:252,lbl:"21'0\"",tip:"Tallest upright stone at Stonehenge",c:'#8b7355',t:'stonehenge',count:3},
+    {n:"Niagara Falls",in:2040,lbl:"170'0\"",tip:"Height of the falls — 23 Wembanyamas stacked",c:'#5b8fa8',t:'falls',count:23},
+    {n:"Statue of Liberty",in:1860,lbl:"155'0\"",tip:"Ground to torch — 21 Wembanyamas stacked",c:'#8aab9c',t:'liberty',count:21},
+    {n:"Eiffel Tower",in:12996,lbl:"1,083 ft",tip:"Full height to antenna tip — 147 Wembanyamas stacked",c:'#607080',t:'eiffel',count:147},
   ],
   wingspan:[
     {n:"Car width",in:73,lbl:"~6'1\"",tip:"Typical sedan width: ~73 inches",c:LITE,hz:true},
@@ -261,8 +264,18 @@ function render(cat){
     body.style.cssText=`display:flex;align-items:flex-end;justify-content:center;height:${Math.round(maxIn*scale)}px`;
     const h=Math.round(item.in*scale);
     body.innerHTML=objSVG(item,h);
-    const lbl=document.createElement('div');lbl.className=`fig-label${item.w?' gold':''}`;
-    lbl.innerHTML=`<b>${item.n}</b>${item.lbl}`;
+    const lbl=document.createElement('div');
+    lbl.className=`fig-label${item.w?' gold':''}`;
+
+    if(cat==='landmarks' && item.count){
+      const countStr = item.w
+        ? `<span class="wemby-count">= 1× Wemby</span>`
+        : `<span class="wemby-count">= ${item.count}× Wemby</span>`;
+      lbl.innerHTML=`<b>${item.n}</b>${item.lbl}${countStr}`;
+    } else {
+      lbl.innerHTML=`<b>${item.n}</b>${item.lbl}`;
+    }
+
     fig.appendChild(tip);fig.appendChild(body);fig.appendChild(lbl);canvas.appendChild(fig);
   });
   const ground=document.createElement('div');ground.className='ground-line';canvas.appendChild(ground);
